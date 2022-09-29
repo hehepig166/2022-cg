@@ -1,0 +1,8 @@
+/usr/bin/ld: /tmp/ccCrVEpd.o: in function `main':
+test_4_flat.cpp:(.text+0x430): undefined reference to `stbi_set_flip_vertically_on_load'
+/usr/bin/ld: test_4_flat.cpp:(.text+0x45a): undefined reference to `stbi_load'
+/usr/bin/ld: test_4_flat.cpp:(.text+0x4fa): undefined reference to `stbi_image_free'
+/usr/bin/ld: test_4_flat.cpp:(.text+0x5b2): undefined reference to `stbi_load'
+/usr/bin/ld: test_4_flat.cpp:(.text+0x652): undefined reference to `stbi_image_free'
+collect2: error: ld returned 1 exit status
+make: *** [Makefile:7: a.out] Error 1
