@@ -3,8 +3,8 @@
 
 #include <iostream>
 
-#include "square.hpp"
 #include "camera.h"
+#include "square.hpp"
 
 void processInput(GLFWwindow *window);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -30,22 +30,22 @@ void mainloop(GLFWwindow *window)
 
     square a[5];
 
-    float w=5, h=8;
+    float w=3, h=4;
 
     a[0].width = w;
     a[0].height = h;
     a[1].width = w;
-    a[1].height = 4;
+    a[1].height = 1;
     a[1].model = glm::rotate(a[1].model, PI/2, glm::vec3(1, 0, 0));
-    a[2].width = 6;
+    a[2].width = 2;
     a[2].height = h;
     a[2].model = glm::rotate(a[2].model, -PI/2, glm::vec3(0, 1, 0));
-    a[3].width = 8;
+    a[3].width = 3;
     a[3].height = h;
     a[3].model = glm::translate(a[3].model, glm::vec3(w, 0, 0));
     a[3].model = glm::rotate(a[3].model, -PI/2, glm::vec3(0, 1, 0));
     a[4].width = w;
-    a[4].height = h;
+    a[4].height = 4;
     a[4].model = glm::translate(a[4].model, glm::vec3(0, h, 0));
     a[4].model = glm::rotate(a[4].model, PI/2, glm::vec3(1, 0, 0));
 
@@ -58,7 +58,7 @@ void mainloop(GLFWwindow *window)
         deltaTime = currentFrame - lastFrame;
         if (deltaTime < 0.02) continue;
         lastFrame = currentFrame;
-        std::cout <<(int)(1.0/deltaTime) <<" fps" <<std::endl;
+        //std::cout <<(int)(1.0/deltaTime) <<" fps" <<std::endl;
 
         // input
         processInput(window);
@@ -197,8 +197,8 @@ GLFWwindow* createWindow(int width, int height, const char* title)
     glfwSetCursorPosCallback(window, curse_poscallback);
     glfwSetScrollCallback(window, scroll_callback);
     
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-    //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     return window;
 }
