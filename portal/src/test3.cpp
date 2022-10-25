@@ -18,7 +18,7 @@ const unsigned int SCR_WIDTH = 1000;
 const unsigned int SCR_HEIGHT = 800;
 const float PI = 3.1415926;
 
-Camera camera(glm::vec3(1.0f, 3.0f, -1.0f));
+Camera camera(glm::vec3(1.0f, 1.0f, 3.0f));
 
 // timing
 float deltaTime = 0.0f;	// time between current frame and last frame
@@ -56,7 +56,9 @@ void mainloop(GLFWwindow *window)
         // per-frame time logic
         float currentFrame = static_cast<float>(glfwGetTime());
         deltaTime = currentFrame - lastFrame;
+        if (deltaTime < 0.02) continue;
         lastFrame = currentFrame;
+        std::cout <<(int)(1.0/deltaTime) <<" fps" <<std::endl;
 
         // input
         processInput(window);
@@ -68,7 +70,7 @@ void mainloop(GLFWwindow *window)
 
         // get view, projection
         glm::mat4 view          = camera.GetViewMatrix();
-        view = glm::rotate(view, -PI/2, glm::vec3(1, 0, 0));
+        //view = glm::rotate(view, -PI/2, glm::vec3(1, 0, 0));
         glm::mat4 projection    = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 
 
@@ -125,6 +127,8 @@ void processInput(GLFWwindow *window)
         camera.ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.ProcessKeyboard(RIGHT, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+        camera.ProcessKeyboard(UP, deltaTime);
 }
 
 void curse_poscallback(GLFWwindow *window, double xposIn, double yposIn)
@@ -145,7 +149,7 @@ void curse_poscallback(GLFWwindow *window, double xposIn, double yposIn)
         firstMouse = false;
     }
 
-    std::cout <<lastX <<" " <<lastY <<"->" <<xpos <<" " <<ypos <<"(" <<xposIn <<" " <<yposIn <<")" <<std::endl;
+    //std::cout <<lastX <<" " <<lastY <<"->" <<xpos <<" " <<ypos <<"(" <<xposIn <<" " <<yposIn <<")" <<std::endl;
 
     float xoffset = xpos - lastX;
     float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
@@ -193,8 +197,8 @@ GLFWwindow* createWindow(int width, int height, const char* title)
     glfwSetCursorPosCallback(window, curse_poscallback);
     glfwSetScrollCallback(window, scroll_callback);
     
-    //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+    //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     return window;
 }
