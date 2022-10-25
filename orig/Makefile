@@ -1,16 +1,16 @@
-FLAG_LIB		=	./lib/glfw3.dll -lm  
+FLAG_LIB		=	-lglfw3 -lGL -lm -ldl -lXinerama -lXrandr -lXi -lXcursor -lX11 -lXxf86vm -lpthread
 FLAG_INCLUDE	=	-I ./include
 SRC_UTIL		=	./src/glad.c
-FLAGS			=	$(FLAG_LIB) $(FLAG_INCLUDE) $(SRC_UTIL) 
+FLAGS			=	$(SRC_UTIL) $(FLAG_LIB) $(FLAG_INCLUDE)
 
-a.exe: ./src/main.cpp
+a.out: ./src/test.cpp
 	g++ $< $(FLAGS)
 
 
 .PHONY:
-run: a.exe
-	./a.exe
+run: a.out
+	./a.out
 
 .PHONY:
-clean: 
-	del a.exe
+clean:
+	rm -f ./a.out
