@@ -3,7 +3,7 @@ FLAG_INCLUDE	=	-I ./include
 SRC_UTIL		=	./src/glad.c
 FLAGS			=	$(SRC_UTIL) $(FLAG_LIB) $(FLAG_INCLUDE)
 
-a.out: ./src/test2.cpp
+a.out: ./src/test3.cpp
 	g++ $< $(FLAGS)
 
 
