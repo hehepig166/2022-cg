@@ -21,55 +21,52 @@ const unsigned int SCR_WIDTH = 1000;
 const unsigned int SCR_HEIGHT = 800;
 const float PI = 3.1415926;
 
-Camera camera(glm::vec3(0.0f, 0.0f, .4f));
+Camera camera(glm::vec3(1.0f, 1.0f, 1.0f));
 
 // timing
 float deltaTime = 0.0f;	// time between current frame and last frame
 float lastFrame = 0.0f;
 
-int anum=5;
 square a[5];
 Portal b[2];
 Shader *shader;
 
-float rotang;
-
 void tmp_generate()
 {
-    float w=2, h=4, d=.5;
+    float w=2, h=4;
     a[0].width = w;
     a[0].height = h;
-    a[0].color = glm::vec3(.0f, 0.5f, 0.0f);
-    a[0].model = glm::translate(a[0].model, glm::vec3(-w/2, -h/2, 0.0f));
-
+    a[0].color = glm::vec3(.25f, 0.0, 0.0);
     a[1].width = w;
-    a[1].height = h;
-    a[1].color = glm::vec3(.5f, 0.0f, 0.5f);
-    a[1].model = glm::translate(a[1].model, glm::vec3(w/2+d, -h/2, 0.0f));
-
-    a[2].width = .05;
-    a[2].height = 1;
-    a[2].color = glm::vec3(.0f, 1.0f, .25f);
-    a[2].model = glm::translate(a[2].model, glm::vec3(w+d, -1.0f, 0.0f)) * glm::rotate(glm::mat4(1), PI/2, glm::vec3(1.0f, .0f, .0f));
-
-    a[3].width = .2;
-    a[3].height = .3;
-    a[3].color = glm::vec3(.5f, 0.0f, 1.0f);
-    a[3].model = glm::translate(a[3].model, glm::vec3(.0f, -1.0f, 0.0f)) * glm::rotate(glm::mat4(1), -PI/4, glm::vec3(.0f, 1.0f, .0f));
-
-    a[anum-1].width = .3;
-    a[anum-1].height = .3;
-    a[anum-1].color = glm::vec3(0.0f, 0.0f, .3f);
+    a[1].height = 1.5;
+    a[1].model = glm::rotate(a[1].model, PI/2, glm::vec3(1.0f, 0.0f, 0.0f));
+    a[1].color = glm::vec3(.0f, 0.5f, 0.0f);
+    a[2].width = 2;
+    a[2].height = h;
+    a[2].model = glm::rotate(a[2].model, -PI/2, glm::vec3(0.0f, 1.0f, 0.0f));
+    a[2].color = glm::vec3(.5f, 0.0f, 0.5f);
+    a[3].width = 2;
+    a[3].height = h;
+    a[3].model = glm::translate(a[3].model, glm::vec3(w, 0.0f, 0.0f));
+    a[3].model = glm::rotate(a[3].model, -PI/2, glm::vec3(0.0f, 1.0f, 0.0f));
+    a[3].color = glm::vec3(.5f, 0.0f, 0.5f);
+    a[4].width = w;
+    a[4].height = 2.5;
+    a[4].model = glm::translate(a[4].model, glm::vec3(0.0f, h, 0.0f));
+    a[4].model = glm::rotate(a[4].model, PI/2, glm::vec3(1.0f, 0.0f, 0.0f));
+    a[4].color = glm::vec3(.5f, 0.0f, 1.0f);
 
     // red
     b[0].destPortal = &b[1];
     b[0].color = glm::vec3(1.0f, .5f, .25f);
-    b[0].model = glm::translate(glm::mat4(1), glm::vec3(0.0f, 1.0f, .3f)) * glm::rotate(glm::mat4(1), PI/2, glm::vec3(1.0f, 0.0f, 0.0f));
+    b[0].model = glm::translate(glm::mat4(1), glm::vec3(1.0f, 3.98f, .3f)) * glm::rotate(glm::mat4(1), PI/2, glm::vec3(1.0f, 0.0f, 0.0f));
 
     // blue
     b[1].destPortal = &b[0];
     b[1].color = glm::vec3(0.25f, .5f, 1.0f);
-    b[1].model = glm::translate(glm::mat4(1), glm::vec3(w+d, 1.0f, .3f)) * glm::rotate(glm::mat4(1), PI/2, glm::vec3(1.0f, 0.0f, 0.0f));
+    b[1].model = glm::translate(glm::mat4(1), glm::vec3(0.02f, 1.0f, .3f))
+        * glm::rotate(glm::mat4(1), PI/2, glm::vec3(0.0f, 0.0f, 1.0f))
+        * glm::rotate(glm::mat4(1), PI/2, glm::vec3(1.0f, 0.0f, 0.0f));
 }
 
 
@@ -95,17 +92,11 @@ void mainloop(GLFWwindow *window)
         // input
         processInput(window);
 
+        tmp_move();
 
         // get view, projection
         glm::mat4 view          = camera.GetViewMatrix();
         glm::mat4 projection    = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-
-        // move
-        a[anum-1].model = glm::translate(glm::mat4(1.0f), camera.Position)
-            * glm::rotate(glm::mat4(1.0f), glm::radians(camera.Yaw), glm::vec3(0, 0, 1))
-            * glm::rotate(glm::mat4(1.0f), glm::radians(camera.Pitch+90), glm::vec3(1, 0, 0))
-            * glm::translate(glm::mat4(1.0f), glm::vec3(-.25, -.25, 0));
-            //* glm::translate(glm::mat4(1.0f), glm::vec3(-.25, -.25, 0));
 
 
         // render
@@ -115,21 +106,18 @@ void mainloop(GLFWwindow *window)
         // draw
 
 
-        drawSimplePortal(b[0], window, view, projection);
-        glClear(GL_STENCIL_BUFFER_BIT);
-        drawSimplePortal(b[1], window, view, projection);
-        //b[1].draw(window, view, projection, *shader);
+        //drawSimplePortal(b[0], window, view, projection);
         //drawRecursivePortals(b[0], window, view, projection, 3, 1);
         //glClear(GL_STENCIL_BUFFER_BIT);
         //drawRecursivePortals(b[1], window, view, projection, 3, 1);
 
 
-        for (int i=0; i<anum; i++)
-            a[i].draw(window, view, projection, *shader);
+        //for (int i=0; i<5; i++)
+        //    a[i].draw(window, view, projection, *shader);
         //for (int i=0; i<2; i++)
         //    b[i].draw(window, view, projection, *shader);
 
-        //drawSimplePortal(b[0], window, view, projection);
+        drawSimplePortal(b[0], window, view, projection);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         glfwSwapBuffers(window);
@@ -181,10 +169,6 @@ void processInput(GLFWwindow *window)
         camera.ProcessKeyboard(UP, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
         camera.ProcessKeyboard(DOWN, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
-        b[1].model = glm::translate(glm::mat4(1), glm::vec3(2.5, 1.0f, .3f))
-        * glm::rotate(glm::mat4(1), rotang+=.1, glm::vec3(0, 0, 1))
-        * glm::rotate(glm::mat4(1), PI/2, glm::vec3(1.0f, 0.0f, 0.0f));
 }
 
 void curse_poscallback(GLFWwindow *window, double xposIn, double yposIn)
@@ -280,7 +264,7 @@ void drawSimplePortal(Portal &portal, GLFWwindow *window, const glm::mat4 &view,
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_STENCIL_TEST);
     glStencilFunc(GL_ALWAYS, 1, 0xff);
-    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
     glStencilMask(0xff);
 
     portal.draw(window, view, projection, *shader);
@@ -296,15 +280,9 @@ void drawSimplePortal(Portal &portal, GLFWwindow *window, const glm::mat4 &view,
     glDepthMask(GL_TRUE);
     glEnable(GL_DEPTH_TEST);
 
-    for (int i=0; i<anum; i++) {
+    for (int i=0; i<5; i++) {
         a[i].draw(window, destView, projection, *shader);
     }
-
-    glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-    glDepthMask(GL_TRUE);
-    glEnable(GL_DEPTH_TEST);
-    portal.draw(window, view, projection, *shader);
-    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
     glStencilMask(0xff);
     glDisable(GL_STENCIL_TEST);
@@ -351,7 +329,7 @@ void drawRecursivePortals(Portal &portal, GLFWwindow *window, const glm::mat4 &v
         // 等于模板数值的通过测试
         glStencilFunc(GL_EQUAL, curRecursionLevel+1, 0xff);
         // 渲染所有普通景物
-        for (int i=0; i<anum; i++)
+        for (int i=0; i<5; i++)
             a[i].draw(window, destView, projection, *shader);
     }
     else {
@@ -399,7 +377,7 @@ void drawRecursivePortals(Portal &portal, GLFWwindow *window, const glm::mat4 &v
 
         glEnable(GL_DEPTH_TEST);
 
-        for (int i=0; i<anum; i++)
+        for (int i=0; i<5; i++)
             a[i].draw(window, destView, projection, *shader);
     }
 

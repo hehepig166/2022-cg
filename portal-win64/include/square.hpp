@@ -14,11 +14,12 @@
 
 struct square {
     float width, height;
+    glm::vec3 color;
     glm::mat4 model;
 
-    square(float w=.5, float h=.5): width(w), height(h), model(1.0f) {}
+    square(float w=.5, float h=.5, glm::vec3 col=glm::vec3(1.0f)): width(w), height(h), color(col), model(1.0f) {}
 
-    void draw(GLFWwindow *window, const glm::mat4 &view, const glm::mat4 &proj);
+    void draw(GLFWwindow *window, const glm::mat4 &view, const glm::mat4 &proj, Shader &shader);
 };
 
 
@@ -27,7 +28,7 @@ void printvec4(glm::vec4 o) {
 }
 
 
-void square::draw(GLFWwindow *window, const glm::mat4 &view, const glm::mat4 &proj) {
+void square::draw(GLFWwindow *window, const glm::mat4 &view, const glm::mat4 &proj, Shader &shader) {
 
     float vertices[] = {
         0,      0,      0,
@@ -42,6 +43,7 @@ void square::draw(GLFWwindow *window, const glm::mat4 &view, const glm::mat4 &pr
     };
 
     glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
 
     GLuint VAO;
     glGenVertexArrays(1, &VAO);
@@ -65,13 +67,12 @@ void square::draw(GLFWwindow *window, const glm::mat4 &view, const glm::mat4 &pr
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    Shader shader("resources/1.vs", "resources/1.fs");
-
     shader.use();
 
     shader.setMat4("model", model);
     shader.setMat4("view", view);
     shader.setMat4("projection", proj);
+    shader.setVec3("color", color);
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
