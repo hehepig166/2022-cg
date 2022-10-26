@@ -77,6 +77,12 @@ void square::draw(GLFWwindow *window, const glm::mat4 &view, const glm::mat4 &pr
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
+
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
+
+    glUseProgram(0);
 }
 
 #endif
