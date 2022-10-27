@@ -50,7 +50,9 @@ bool Portal::test_through(glm::vec3 from_, glm::vec3 to_) {
     //printvec4(from);
     //printvec4(to);
     
-    if (from.z > 0 && to.z < 0) {
+    const float mxpos = 0.1;
+
+    if ((from.z > mxpos && to.z < mxpos)) {
         float t = to.z / (to.z-from.z);
         float x = to.x + t*(from.x-to.x);
         float y = to.y + t*(from.y-to.y);

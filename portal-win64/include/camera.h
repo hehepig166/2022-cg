@@ -130,7 +130,6 @@ public:
             Front = glm::normalize(front);
         }
         else {
-            std::cout <<Yaw <<std::endl;
             Pitch = asin(Front.z) * (180.0/3.1415926);
             float s = Front.x/cos(glm::radians(Pitch));
             float c = Front.y/cos(glm::radians(Pitch));

@@ -17,8 +17,8 @@ void drawSimplePortal(Portal &portal, GLFWwindow *window, const glm::mat4 &view,
 void drawRecursivePortals(Portal &portal, GLFWwindow *window, const glm::mat4 &view, const glm::mat4 &projection, int maxRecursionLevel, int curRecursionLevel);
 
 // settings
-const unsigned int SCR_WIDTH = 100;
-const unsigned int SCR_HEIGHT = 100;
+const unsigned int SCR_WIDTH = 800;
+const unsigned int SCR_HEIGHT = 600;
 const float PI = 3.1415926;
 
 Camera camera(glm::vec3(0.0f, 0.0f, .4f));
@@ -32,7 +32,7 @@ square a[5];
 Portal b[2];
 Shader *shader;
 
-float rotang;
+float pitchang, yawang;
 
 void tmp_generate()
 {
@@ -106,7 +106,10 @@ void mainloop(GLFWwindow *window)
             * glm::rotate(glm::mat4(1.0f), glm::radians(camera.Pitch+90), glm::vec3(1, 0, 0))
             * glm::translate(glm::mat4(1.0f), glm::vec3(-.25, -.25, 0));
             //* glm::translate(glm::mat4(1.0f), glm::vec3(-.25, -.25, 0));
-
+        b[1].model = glm::translate(glm::mat4(1), glm::vec3(2.5, 1.0f, Portal::height/2))
+            * glm::rotate(glm::mat4(1), yawang, glm::vec3(0, 0, 1))
+            * glm::rotate(glm::mat4(1), pitchang, glm::vec3(0, 1, 0))
+            * glm::rotate(glm::mat4(1), PI/2, glm::vec3(1.0f, 0.0f, 0.0f));
 
         // render
         glClearColor(.2f, .3f, .3f, 1.0f);
@@ -115,14 +118,18 @@ void mainloop(GLFWwindow *window)
         // draw
 
         if (glm::distance(glm::vec3(b[0].model*glm::vec4(0, 0, 0, 1)), camera.Position) < glm::distance(glm::vec3(b[1].model*glm::vec4(0, 0, 0, 1)), camera.Position)) {
-            drawSimplePortal(b[0], window, view, projection);
+            if ((glm::inverse(b[0].model) * glm::vec4(camera.Position, 1.0f)).z >= 0)
+                drawSimplePortal(b[0], window, view, projection);
             glClear(GL_STENCIL_BUFFER_BIT);
-            drawSimplePortal(b[1], window, view, projection);
+            if ((glm::inverse(b[1].model) * glm::vec4(camera.Position, 1.0f)).z >= 0)
+                drawSimplePortal(b[1], window, view, projection);
         }
         else {
-            drawSimplePortal(b[1], window, view, projection);
+            if ((glm::inverse(b[1].model) * glm::vec4(camera.Position, 1.0f)).z >= 0)
+                drawSimplePortal(b[1], window, view, projection);
             glClear(GL_STENCIL_BUFFER_BIT);
-            drawSimplePortal(b[0], window, view, projection);
+            if ((glm::inverse(b[0].model) * glm::vec4(camera.Position, 1.0f)).z >= 0)
+                drawSimplePortal(b[0], window, view, projection);
         }
         //b[1].draw(window, view, projection, *shader);
         //drawRecursivePortals(b[0], window, view, projection, 3, 1);
@@ -132,8 +139,9 @@ void mainloop(GLFWwindow *window)
 
         for (int i=0; i<anum; i++)
             a[i].draw(window, view, projection, *shader);
-        //for (int i=0; i<2; i++)
-        //    b[i].draw(window, view, projection, *shader);
+        for (int i=0; i<2; i++) if ((glm::inverse(b[i].model) * glm::vec4(camera.Position, 1.0f)).z < 0) {
+            b[i].draw(window, view, projection, *shader);
+        }
 
         //drawSimplePortal(b[0], window, view, projection);
 
@@ -162,6 +170,9 @@ int main()
 }
 
 
+void tmpfff(glm::vec3 x) {
+    std::cout <<x.x <<" " <<x.y <<" " <<x.z <<std::endl;
+}
 
 
 //========================================================================================
@@ -169,7 +180,6 @@ int main()
 
 void processInput(GLFWwindow *window)
 {
-
     glm::vec3 old_pos = camera.Position;
 
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -188,26 +198,26 @@ void processInput(GLFWwindow *window)
     if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
         camera.ProcessKeyboard(DOWN, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
-        b[1].model = glm::translate(glm::mat4(1), glm::vec3(2.5, 1.0f, Portal::height/2))
-        * glm::rotate(glm::mat4(1), rotang+=.1, glm::vec3(0, 0, 1))
-        * glm::rotate(glm::mat4(1), PI/2, glm::vec3(1.0f, 0.0f, 0.0f));
+        yawang+=.02;
+    if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
+        pitchang+=.02;
     
     glm::vec3 new_pos = camera.Position;
     for (int i=0; i<2; i++) if (b[i].test_through(old_pos, new_pos)) {
-        std::cout <<i <<std::endl;
-        //std::cout <<camera.Position.x <<" " <<camera.Position.y <<" " <<camera.Position.z <<std::endl;
-        glm::mat4 tmpmodel = glm::mat4(1.0f)
-            * b[i].destPortal->model
+        std::cout <<camera.Position.x <<" " <<camera.Position.y <<" " <<camera.Position.z <<std::endl;
+        glm::mat4 tmpmodel = b[i].destPortal->model
             * glm::rotate(glm::mat4(1.0f), glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f))
             * glm::inverse(b[i].model);
+
         camera.Position = glm::vec3(tmpmodel * glm::vec4(camera.Position, 1.0f));
+
         glm::vec3 Base = glm::vec3(tmpmodel * glm::vec4(0, 0, 0, 1));
         glm::vec3 Up = glm::vec3(tmpmodel * glm::vec4(camera.Up, 1.0f)) - Base;
         glm::vec3 Right = glm::vec3(tmpmodel * glm::vec4(camera.Right, 1.0f)) - Base;
 
         camera.Front = glm::normalize(glm::cross(Up, Right));
-
         camera.updateCameraVectors(false);
+        std::cout <<camera.Position.x <<" " <<camera.Position.y <<" " <<camera.Position.z <<std::endl;
         break;
     }
     if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
