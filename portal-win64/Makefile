@@ -4,12 +4,13 @@ SRC_UTIL		=	./src/glad.c
 FLAGS			=	$(FLAG_LIB) $(FLAG_INCLUDE) $(SRC_UTIL) 
 
 SRC_MAIN		=	./src/test3.cpp
+#SRC_MAIN		=	./src/test_portal.cpp
 
 target: $(SRC_MAIN)
-	g++ $< $(FLAGS)
+	g++ $< $(FLAGS) -O3
 
 static: $(SRC_MAIN)
-	g++ $< $(FLAGS) -static
+	g++ $< $(FLAGS) -O3 -static
 
 
 .PHONY:
